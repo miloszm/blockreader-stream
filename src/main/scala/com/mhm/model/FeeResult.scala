@@ -1,5 +1,9 @@
 package com.mhm.model
 
+import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport
+import io.circe.{Decoder, Encoder}
+import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
+
 case class FeeResult
 (
   topBlock: Long,
@@ -22,7 +26,7 @@ case class FeeResult
   usdPrice: BigDecimal
 )
 
-object FeeResult {
+object FeeResult  extends ErrorAccumulatingCirceSupport {
   def empty = FeeResult(0,0,0,0,0,0,0,0,0,0,0,Nil,0,0,0,0,true,0)
   def fake = FeeResult(
     550000,
@@ -46,4 +50,7 @@ object FeeResult {
     0.01,
     true,
     8800)
+
+  implicit val requestDecoder: Decoder[FeeResult] = deriveDecoder[FeeResult]
+  implicit val requestEncoder: Encoder[FeeResult] = deriveEncoder[FeeResult]
 }
