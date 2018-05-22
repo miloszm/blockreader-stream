@@ -1,4 +1,4 @@
-package com.mhm.model
+package com.mhm.blockreader.model
 
 import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport
 import io.circe.{Decoder, Encoder}

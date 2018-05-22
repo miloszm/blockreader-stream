@@ -1,8 +1,8 @@
-package com.mhm.server
+package com.mhm.blockreader.server
 
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import com.mhm.model.FeeResult
+import com.mhm.blockreader.model.FeeResult
 import org.scalatest.{FunSpec, Matchers}
 
 class BlockReaderRoutesSpec extends FunSpec

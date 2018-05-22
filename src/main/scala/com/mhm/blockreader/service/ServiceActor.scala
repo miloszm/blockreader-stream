@@ -1,4 +1,4 @@
-package com.mhm.service
+package com.mhm.blockreader.service
 
 import akka.actor.Actor
 

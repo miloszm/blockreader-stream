@@ -1,9 +1,9 @@
-package com.mhm
+package com.mhm.blockreader
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
-import com.mhm.server.BlockReaderRoutes
+import com.mhm.blockreader.server.BlockReaderRoutes
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
 

@@ -1,7 +1,7 @@
-package com.mhm.server
+package com.mhm.blockreader.server
 
 import akka.http.scaladsl.server.Directives._
-import com.mhm.model.FeeResult
+import com.mhm.blockreader.model.FeeResult
 
 trait BlockReaderRoutes {
 
