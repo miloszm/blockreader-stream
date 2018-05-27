@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.stream.scaladsl.{Flow, GraphDSL, Sink}
 import akka.stream.{ActorMaterializer, FlowShape}
 import akka.{Done, NotUsed}
-import com.mhm.blockreader.model.{JsonBlock, JsonTransaction}
+import com.mhm.blockreader.model.{BlockTrait, FeeOnlyTransaction}
 import com.mhm.blockreader.util.IterableIteratorWrapper.toImmutableIter
 
 import scala.concurrent.duration._
@@ -18,14 +18,14 @@ object TransactionFlow {
   case class NotUsedRequest(x: Int)
 
   def create(implicit as: ActorSystem, am: ActorMaterializer):
-    Flow[JsonBlock, JsonTransaction, NotUsed] = Flow.fromGraph(GraphDSL.create() { implicit builder =>
+    Flow[BlockTrait, FeeOnlyTransaction, NotUsed] = Flow.fromGraph(GraphDSL.create() { implicit builder =>
     import GraphDSL.Implicits._
 
-    val in = builder.add(Flow[JsonBlock])
-    val out = builder.add(Flow[JsonTransaction])
+    val in = builder.add(Flow[BlockTrait])
+    val out = builder.add(Flow[FeeOnlyTransaction])
 
-    in.mapConcat[JsonTransaction]{ block =>
-      toImmutableIter[JsonTransaction](block.tx)
+    in.mapConcat[FeeOnlyTransaction]{ block =>
+      toImmutableIter[FeeOnlyTransaction](block.tx)
     } ~> out
 
     FlowShape.of(in.in, out.out)

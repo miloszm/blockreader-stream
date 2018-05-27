@@ -16,14 +16,21 @@ object BlockLabel extends ErrorAccumulatingCirceSupport {
   implicit val blockLabelEncoder: Encoder[BlockLabel] = deriveEncoder[BlockLabel]
 }
 
-case class JsonOutput(value: Option[Long]) extends ErrorAccumulatingCirceSupport
+case class JsonOutput(value: Option[Long]) extends ErrorAccumulatingCirceSupport {
+  def toOutput = value.map(v => Output(v))
+}
 
 object JsonOutput {
   implicit val jsonInputDecoder: Decoder[JsonOutput] = deriveDecoder[JsonOutput]
   implicit val jsonInputEncoder: Encoder[JsonOutput] = deriveEncoder[JsonOutput]
 }
 
-case class JsonInput(prev_out: Option[JsonOutput]) extends ErrorAccumulatingCirceSupport
+case class JsonInput(prev_out: Option[JsonOutput]) extends ErrorAccumulatingCirceSupport {
+  def toInput = for {
+    prev <- prev_out
+    v <- prev.value
+  } yield Input(v)
+}
 
 object JsonInput {
   implicit val jsonInputDecoder: Decoder[JsonInput] = deriveDecoder[JsonInput]
@@ -39,14 +46,23 @@ case class JsonTransaction(
                             hash: String,
                             size: Int,
                             time: Long
-                          )
+                          ){
+  def toFeeOnlyTransaction(height: Long, index: Int, blockTime: Long) = {
+    val sumInputs: Long = inputs.flatMap(_.toInput).map(_.value).sum
+    val sumOutputs: Long = out.flatMap(_.toOutput).map(_.value).sum
+    val fees = sumInputs - sumOutputs
+    FeeOnlyTransaction(height, index, fees, size, time, blockTime)
+  }
+}
 
 object JsonTransaction  extends ErrorAccumulatingCirceSupport {
   implicit val jsonTransactionDecoder: Decoder[JsonTransaction] = deriveDecoder[JsonTransaction]
   implicit val jsonTransactionEncoder: Encoder[JsonTransaction] = deriveEncoder[JsonTransaction]
 }
 
-case class JsonBlock(fee: Long, height: Long, n_tx: Int, tx: Seq[JsonTransaction], time: Long)
+case class JsonBlock(fee: Long, height: Long, n_tx: Int, tx: Seq[JsonTransaction], time: Long){
+  def toBlock = Block(fee, height, n_tx, tx.zipWithIndex.map{case (transaction, index) => transaction.toFeeOnlyTransaction(height, index, time)}, time)
+}
 
 object JsonBlock extends ErrorAccumulatingCirceSupport {
   val ErrorBlock = JsonBlock(0, -1, 0, Nil, 0l)

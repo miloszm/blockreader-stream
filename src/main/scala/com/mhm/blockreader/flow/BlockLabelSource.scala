@@ -15,7 +15,11 @@ import com.mhm.blockreader.model.BlockLabel.VoidBlock
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 import scala.util.{Failure, Success, Try}
+import scala.concurrent.ExecutionContext.Implicits.global
 
+/**
+  * source of simple block objects with height, hash, and time
+  */
 object BlockLabelSource {
   val lastSeenBlock = new AtomicInteger(VoidBlock.height)
   def create(implicit as: ActorSystem, am: ActorMaterializer): Source[BlockLabel, NotUsed] = Source.fromGraph(GraphDSL.create() { implicit builder =>
