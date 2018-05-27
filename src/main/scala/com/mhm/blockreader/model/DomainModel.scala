@@ -3,6 +3,15 @@ package com.mhm.blockreader.model
 import com.mhm.blockreader.util.StatCalc
 
 
+case class BlockLabel(height: Int, hash: String, time: Long){
+  def isValid = height >= 0
+}
+
+object BlockLabel {
+  val VoidBlock = BlockLabel(-1, "", 0l)
+  val ErrorBlock = BlockLabel(-2, "", 0l)
+}
+
 case class Output(value: Long)
 
 case class Input(value: Long)

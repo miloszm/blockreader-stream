@@ -5,15 +5,13 @@ import io.circe.{Decoder, Encoder}
 import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
 
 
-case class BlockLabel(height: Int, hash: String, time: Long){
-  def isValid = height >= 0
+case class JsonBlockLabel(height: Int, hash: String, time: Long){
+  def toBlockLabel = BlockLabel(height, hash, time)
 }
 
-object BlockLabel extends ErrorAccumulatingCirceSupport {
-  val VoidBlock = BlockLabel(-1, "", 0l)
-  val ErrorBlock = BlockLabel(-2, "", 0l)
-  implicit val blockLabelDecoder: Decoder[BlockLabel] = deriveDecoder[BlockLabel]
-  implicit val blockLabelEncoder: Encoder[BlockLabel] = deriveEncoder[BlockLabel]
+object JsonBlockLabel extends ErrorAccumulatingCirceSupport {
+  implicit val blockLabelDecoder: Decoder[JsonBlockLabel] = deriveDecoder[JsonBlockLabel]
+  implicit val blockLabelEncoder: Encoder[JsonBlockLabel] = deriveEncoder[JsonBlockLabel]
 }
 
 case class JsonOutput(value: Option[Long]) extends ErrorAccumulatingCirceSupport {

@@ -9,7 +9,7 @@ import akka.http.scaladsl.model.{HttpRequest, HttpResponse, StatusCodes}
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.{ActorMaterializer, SourceShape}
 import akka.stream.scaladsl.{Flow, GraphDSL, Keep, Sink, Source}
-import com.mhm.blockreader.model.BlockLabel
+import com.mhm.blockreader.model.{BlockLabel, JsonBlockLabel}
 import com.mhm.blockreader.model.BlockLabel.VoidBlock
 
 import scala.concurrent.{Await, Future}
@@ -31,7 +31,7 @@ object BlockLabelSource {
     val responseFlow: Flow[(Try[HttpResponse], NotUsedRequest), BlockLabel, NotUsed] = Flow[(Try[HttpResponse],NotUsedRequest)].mapAsync(5) {
       case (resultTry: Try[HttpResponse], _: NotUsedRequest) => resultTry match {
         case Success(httpResponse@HttpResponse (StatusCodes.OK, _, _, _)) =>
-          Unmarshal (httpResponse).to[BlockLabel]
+          Unmarshal (httpResponse).to[JsonBlockLabel].map(_.toBlockLabel)
         case Failure(e) => Future.successful(BlockLabel.ErrorBlock)
       }
       case _ => throw new IllegalStateException()

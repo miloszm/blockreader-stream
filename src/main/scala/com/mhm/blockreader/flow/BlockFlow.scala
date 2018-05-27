@@ -7,7 +7,7 @@ import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.scaladsl.{Flow, GraphDSL, Sink}
 import akka.stream.{ActorMaterializer, FlowShape}
 import akka.{Done, NotUsed}
-import com.mhm.blockreader.model.{BlockLabel, BlockTrait, EmptyBlock, JsonBlock}
+import com.mhm.blockreader.model._
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
