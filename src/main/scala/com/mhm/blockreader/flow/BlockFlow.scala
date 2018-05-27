@@ -18,22 +18,23 @@ import scala.concurrent.ExecutionContext.Implicits.global
   * converts blocklabel stream into block stream
   */
 object BlockFlow {
-  case class NotUsedRequest(x: Int)
+  case class NotUsedRequest(blockLabel: BlockLabel)
 
   def create(implicit as: ActorSystem, am: ActorMaterializer):
     Flow[BlockLabel, BlockTrait, NotUsed] = Flow.fromGraph(GraphDSL.create() { implicit builder =>
     import GraphDSL.Implicits._
 
     val responseFlow: Flow[(Try[HttpResponse], NotUsedRequest), BlockTrait, NotUsed] = Flow[(Try[HttpResponse],NotUsedRequest)].mapAsync(5) {
-      case (resultTry: Try[HttpResponse], _: NotUsedRequest) => resultTry match {
+      case (resultTry: Try[HttpResponse], request: NotUsedRequest) => resultTry match {
         case Success(httpResponse@HttpResponse (StatusCodes.OK, _, _, _)) =>
           Unmarshal(httpResponse).to[JsonBlock].map(_.toBlock)
-        case Failure(e) => Future.successful(EmptyBlock)
+        case Failure(e) => Future.successful(request.blockLabel)
       }
       case _ => throw new IllegalStateException()
     }
     val getter = Http().cachedHostConnectionPoolHttps[NotUsedRequest]("blockchain.info")
-    val blocks = Flow[BlockLabel].map(blockLabel => (HttpRequest(uri = s"https://blockchain.info/rawblock/${blockLabel.hash}"), NotUsedRequest(0))).via(getter)
+    val blocks = Flow[BlockLabel].map(blockLabel =>
+      (HttpRequest(uri = s"https://blockchain.info/rawblock/${blockLabel.hash}"), NotUsedRequest(blockLabel))).via(getter)
 
     val in = builder.add(Flow[BlockLabel])
     val out = builder.add(Flow[BlockTrait])

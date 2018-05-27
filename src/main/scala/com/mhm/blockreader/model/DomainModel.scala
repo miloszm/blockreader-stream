@@ -3,15 +3,6 @@ package com.mhm.blockreader.model
 import com.mhm.blockreader.util.StatCalc
 
 
-case class BlockLabel(height: Int, hash: String, time: Long){
-  def isValid = height >= 0
-}
-
-object BlockLabel {
-  val VoidBlock = BlockLabel(-1, "", 0l)
-  val ErrorBlock = BlockLabel(-2, "", 0l)
-}
-
 case class Output(value: Long)
 
 case class Input(value: Long)
@@ -37,9 +28,15 @@ sealed trait BlockTrait {
 }
 
 case class Block(fee: Long, height: Long, n_tx: Int, tx: Seq[FeeOnlyTransaction], time: Long) extends BlockTrait
-object EmptyBlock extends BlockTrait {
+
+case class BlockLabel(height: Int, hash: String, time: Long) extends BlockTrait{
   def tx = Nil
   def n_tx = 0
-  def time = 0
+  def isValid = height >= 0
   override def isEmpty = true
+}
+
+object BlockLabel {
+  val VoidBlock = BlockLabel(-1, "", 0l)
+  val ErrorBlock = BlockLabel(-2, "", 0l)
 }
