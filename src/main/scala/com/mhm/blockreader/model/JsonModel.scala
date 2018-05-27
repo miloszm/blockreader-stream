@@ -58,7 +58,7 @@ object JsonTransaction  extends ErrorAccumulatingCirceSupport {
   implicit val jsonTransactionEncoder: Encoder[JsonTransaction] = deriveEncoder[JsonTransaction]
 }
 
-case class JsonBlock(fee: Long, height: Long, n_tx: Int, tx: Seq[JsonTransaction], time: Long){
+case class JsonBlock(fee: Long, height: Int, n_tx: Int, tx: Seq[JsonTransaction], time: Long){
   def toBlock = Block(fee, height, n_tx, tx.zipWithIndex.map{case (transaction, index) => transaction.toFeeOnlyTransaction(height, index, time)}, time)
 }
 

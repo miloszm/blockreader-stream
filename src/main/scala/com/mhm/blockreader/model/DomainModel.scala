@@ -25,15 +25,19 @@ sealed trait BlockTrait {
   def maxFee = if (feesSize == 0) 0L else fees.max
   def minFee = if (feesSize == 0) 0L else fees.min
   def medianFee: Long = StatCalc.median(fees)
+  def toBlockLabel: BlockLabel
 }
 
-case class Block(fee: Long, height: Long, n_tx: Int, tx: Seq[FeeOnlyTransaction], time: Long) extends BlockTrait
+case class Block(fee: Long, height: Int, n_tx: Int, tx: Seq[FeeOnlyTransaction], time: Long) extends BlockTrait {
+  override def toBlockLabel = BlockLabel(height, "", time)
+}
 
 case class BlockLabel(height: Int, hash: String, time: Long) extends BlockTrait{
   def tx = Nil
   def n_tx = 0
   def isValid = height >= 0
   override def isEmpty = true
+  override def toBlockLabel: BlockLabel = this
 }
 
 object BlockLabel {
